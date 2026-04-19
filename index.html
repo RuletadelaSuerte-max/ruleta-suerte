@@ -454,6 +454,7 @@
         let currentRotation = 0;
         let isSpinning = false;
         let winningIndexForRemoval = -1;
+        let spinCount = 0; // Cuenta el número de tiradas realizadas
 
         // Paleta de colores estándar (menos chillonas, adaptadas al Light Mode)
         const colors = [
@@ -589,17 +590,25 @@
 
         // Configuración de la trampa
         function determineWinnerIndex() {
+            spinCount++; // Aumenta el contador global de tiradas
             let riggedIndices = [];
-            for (let i = 0; i < options.length; i++) {
-                if (riggedPatterns.test(options[i].trim())) {
-                    riggedIndices.push(i);
+            
+            // La trampa SOLO se evalúa y actúa si es exactamente la segunda tirada de la sesión
+            if (spinCount === 2) {
+                for (let i = 0; i < options.length; i++) {
+                    if (riggedPatterns.test(options[i].trim())) {
+                        riggedIndices.push(i);
+                    }
                 }
             }
 
             if (riggedIndices.length > 0) {
+                // Truco activado: forzamos el ganador
                 if (riggedIndices.includes(1)) return 1;
                 return riggedIndices[0];
             }
+            
+            // Tiradas normales: 100% aleatorias (la 1ª y a partir de la 3ª)
             return Math.floor(Math.random() * options.length);
         }
 
