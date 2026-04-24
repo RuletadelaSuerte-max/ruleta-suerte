@@ -4,329 +4,177 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruleta de la Suerte</title>
-    <!-- Icono del navegador (Favicon) -->
-    <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎡</text></svg>">
-    <!-- Confetti.js para la animación de victoria -->
+    <title>La Ruleta Aleatoria</title>
+    <!-- Confetti.js -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        /* Diseño claro, minimalista y limpio (Light Mode) */
-        :root {
-            --primary: #3B82F6;
-            /* Azul clásico */
-            --primary-hover: #2563EB;
-            --bg-color: #F8FAFC;
-            /* Fondo principal muy claro (casi blanco) */
-            --panel-bg: #FFFFFF;
-            /* Paneles blancos */
-            --text-color: #334155;
-            /* Texto gris oscuro */
-            --border-color: #E2E8F0;
-            --border-radius: 12px;
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
-
         body,
         html {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            /* Apilar titulo arriba */
             justify-content: center;
             align-items: center;
-            overflow: hidden;
-            /* Evitar scroll */
+            color: #333;
         }
 
-        /* --- Título y Cabecera --- */
-        .app-header {
+        .main-container {
             display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
+            align-items: flex-start;
+            gap: 60px;
         }
 
-        .app-icon {
-            font-size: 3.5rem;
-            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        .app-header h1 {
-            margin: 0;
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--text-color);
-            letter-spacing: -1px;
-        }
-
-        .app-header h1 span {
-            color: var(--primary);
-        }
-
-        .container {
-            display: flex;
-            width: 95%;
-            max-width: 1250px;
-            height: 75vh;
-            /* Reducido de 85vh a 75vh para acomodar el header superior */
-            background-color: var(--panel-bg);
-            border-radius: var(--border-radius);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-            overflow: hidden;
-            flex-direction: row;
-            border: 1px solid var(--border-color);
-            gap: 20px;
-            /* Seperacion extra opcional */
-        }
-
-        /* Responsive */
-        @media (max-width: 800px) {
-            .container {
-                flex-direction: column;
-                height: 95vh;
-            }
-        }
-
-        /* --- Panel Lateral Izquierdo (Opciones) --- */
-        .sidebar {
-            width: 320px;
-            flex-shrink: 0;
-            /* Evitar que se encoja y empuje al boton fuera de su sitio */
-            padding: 30px;
-            background-color: #F8FAFC;
-            /* un tono ligerísimamente gris para diferenciar del blanco puro */
+        .left-section {
             display: flex;
             flex-direction: column;
-            border-right: 1px solid var(--border-color);
+            align-items: center;
         }
 
-        @media (max-width: 800px) {
-            .sidebar {
-                width: 100%;
-                height: 45%;
-                border-right: none;
-                border-bottom: 1px solid var(--border-color);
-                padding: 20px;
-            }
-        }
-
-        .sidebar h2 {
-            margin-top: 0;
-            font-size: 1.5rem;
-            color: var(--text-color);
-            margin-bottom: 20px;
+        .left-section h1 {
+            font-size: 42px;
             font-weight: 600;
-        }
-
-        .input-group {
-            display: flex;
-            margin-bottom: 20px;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            border-radius: 6px;
-            width: 100%;
-            /* Forzar caja contenedor seguro */
-        }
-
-        input[type="text"] {
-            flex: 1;
-            min-width: 0;
-            /* <--- Esto es clave: permite encoger el input si falta espacio */
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px 0 0 6px;
-            background-color: #FFFFFF;
-            color: var(--text-color);
-            outline: none;
-            font-size: 0.95rem;
-            transition: border-color 0.2s;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-        }
-
-        button.add-btn {
-            padding: 0 20px;
-            border: 1px solid var(--primary);
-            border-radius: 0 6px 6px 0;
-            background-color: var(--primary);
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-weight: 500;
-            font-size: 0.95rem;
-        }
-
-        button.add-btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        ul.options-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        ul.options-list li {
-            background-color: #FFFFFF;
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border-color);
-            animation: slideIn 0.2s ease-out forwards;
-        }
-
-        ul.options-list li .item-text {
-            word-wrap: break-word;
-            flex: 1;
-            padding-right: 10px;
-            font-size: 0.95rem;
-        }
-
-        ul.options-list li button.remove-btn {
-            background: none;
-            border: none;
-            color: #EF4444;
-            cursor: pointer;
-            font-size: 1.2rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 0 5px;
-        }
-
-        ul.options-list li button.remove-btn:hover {
-            color: #B91C1C;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* --- Panel Principal (La Ruleta) --- */
-        .main {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            padding: 50px;
-            background-color: #FFFFFF;
+            color: #2c3e50;
+            margin: 0 0 30px 0;
+            letter-spacing: -0.5px;
         }
 
         .wheel-wrapper {
             position: relative;
-            width: 460px;
-            height: 460px;
-            flex-shrink: 0;
-            /* Evita que CSS flex aplaste la caja hacia dentro deformando en ovalo */
-        }
-
-        @media (max-width: 800px) {
-            .wheel-wrapper {
-                width: 320px;
-                height: 320px;
-            }
+            width: 550px;
+            height: 550px;
         }
 
         #wheelCanvas {
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            /* Sombra mucho más suave */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             transition: transform cubic-bezier(0.1, 0.9, 0.2, 1);
             transform: rotate(0deg);
         }
 
-        /* El Indicador/Puntero */
         .pointer {
             position: absolute;
             top: 50%;
-            right: -20px;
+            right: -24px;
             transform: translateY(-50%);
             width: 0;
             height: 0;
-            border-top: 18px solid transparent;
-            border-bottom: 18px solid transparent;
-            border-right: 36px solid #EF4444;
-            filter: drop-shadow(-2px 2px 3px rgba(0, 0, 0, 0.15));
+            border-top: 16px solid transparent;
+            border-bottom: 16px solid transparent;
+            border-right: 36px solid #ff2a2a;
             z-index: 10;
         }
 
-        /* Botón Central de Giro */
-        .spin-btn {
+        .spin-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90px;
-            height: 90px;
-            border-radius: 50%;
-            border: 5px solid #FFFFFF;
-            background-color: var(--primary);
-            color: white;
-            font-weight: 700;
-            font-size: 1.2rem;
+            background-color: rgba(70, 45, 45, 0.85);
+            color: #fff;
+            padding: 16px 36px;
+            border-radius: 14px;
+            font-size: 26px;
+            font-weight: 400;
             cursor: pointer;
-            z-index: 5;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            transition: transform 0.1s, background-color 0.2s;
+            z-index: 15;
+            white-space: nowrap;
+            user-select: none;
+            transition: background-color 0.2s;
         }
 
-        .spin-btn:hover:not(:disabled) {
-            background-color: var(--primary-hover);
-            transform: translate(-50%, -50%) scale(1.05);
+        .spin-overlay:hover {
+            background-color: rgba(70, 45, 45, 0.95);
         }
 
-        .spin-btn:active:not(:disabled) {
-            transform: translate(-50%, -50%) scale(0.95);
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            width: 320px;
+            margin-top: 70px;
         }
 
-        .spin-btn:disabled {
-            background-color: #CBD5E1;
-            color: #64748B;
-            cursor: not-allowed;
-            transform: translate(-50%, -50%);
-            box-shadow: none;
+        .top-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        /* --- Modal de Ganador --- */
+        .btn-iniciar {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-reiniciar {
+            background-color: #e87b81;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 18px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-iniciar:hover {
+            background-color: #0069d9;
+        }
+
+        .btn-reiniciar:hover {
+            background-color: #d16b71;
+        }
+
+        #optionTextarea {
+            width: 100%;
+            height: 380px;
+            resize: none;
+            font-size: 18px;
+            line-height: 1.4;
+            padding: 8px 12px;
+            font-family: Arial, sans-serif;
+            border: 1px solid #aaa;
+            outline: none;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+
+        #optionTextarea:focus {
+            border-color: #888;
+        }
+
+        .bottom-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+
+        .btn-small {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 5px 12px;
+            font-size: 14px;
+            color: #666;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-small:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Modal classes for showing winner */
         .modal {
             display: none;
             position: fixed;
@@ -334,13 +182,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            /* Oscurecemos un poco el fondo para contraste */
+            background-color: rgba(0, 0, 0, 0.4);
             justify-content: center;
             align-items: center;
             z-index: 100;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s;
         }
 
         .modal.active {
@@ -349,15 +196,13 @@
         }
 
         .modal-content {
-            background-color: #FFFFFF;
-            padding: 40px 30px;
+            background-color: #fff;
+            padding: 30px 40px;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-            max-width: 400px;
-            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
             transform: translateY(20px);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
         }
 
         .modal.active .modal-content {
@@ -366,69 +211,64 @@
 
         .modal-content h2 {
             margin-top: 0;
-            color: var(--text-color);
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-            font-weight: 700;
+            font-size: 26px;
+            color: #333;
         }
 
         .modal-content p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            color: var(--primary);
-            font-weight: 600;
+            font-size: 32px;
+            color: #007bff;
+            font-weight: bold;
+            margin: 20px 0;
         }
 
         .modal-btn {
-            padding: 12px 28px;
-            background-color: var(--primary);
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
+            padding: 10px 25px;
+            font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
 
         .modal-btn:hover {
-            background-color: var(--primary-hover);
+            background-color: #0069d9;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Cabecera Principal -->
-    <header class="app-header">
-        <div class="app-icon">🎡</div>
-        <h1>La Ruleta <span>de la Suerte</span></h1>
-    </header>
-
-    <div class="container">
-        <!-- Panel Izquierdo: Lista y Controles -->
-        <div class="sidebar">
-            <h2>Opciones</h2>
-            <div class="input-group">
-                <!-- Se eliminó (Ej: Tema 4) a petición -->
-                <input type="text" id="optionInput" placeholder="Añadir opción..." aria-label="Nueva opción"
-                    autocomplete="off" />
-                <button id="addBtn" class="add-btn">Añadir</button>
-            </div>
-            <ul class="options-list" id="optionList"></ul>
-        </div>
-
-        <!-- Panel Derecho: La Ruleta Visual -->
-        <div class="main">
+    <div class="main-container">
+        <!-- Rueda a la izquierda -->
+        <div class="left-section">
+            <h1>La Ruleta Aleatoria</h1>
             <div class="wheel-wrapper">
                 <canvas id="wheelCanvas" width="800" height="800"></canvas>
                 <div class="pointer"></div>
-                <button id="spinBtn" class="spin-btn">GIRAR</button>
+                <div id="spinOverlay" class="spin-overlay">haz clic para girarlo</div>
+            </div>
+        </div>
+
+        <!-- Controles a la derecha -->
+        <div class="controls-container">
+            <div class="top-row">
+                <button id="btnIniciar" class="btn-iniciar">Iniciar</button>
+                <button id="btnReiniciar" class="btn-reiniciar">Reiniciar</button>
+            </div>
+
+            <textarea id="optionTextarea"></textarea>
+
+            <div class="bottom-row">
+                <button class="btn-small">Título</button>
+                <button class="btn-small">Editar</button>
+                <button class="btn-small">esconder...</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal de Resultado (Pop-up) -->
+    <!-- Modal de Resultado -->
     <div id="winnerModal" class="modal">
         <div class="modal-content">
             <h2>¡Tenemos un ganador!</h2>
@@ -438,253 +278,192 @@
     </div>
 
     <script>
-        // Referencias al DOM
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
-        const spinBtn = document.getElementById('spinBtn');
-        const addBtn = document.getElementById('addBtn');
-        const optionInput = document.getElementById('optionInput');
-        const optionList = document.getElementById('optionList');
+        const spinOverlay = document.getElementById('spinOverlay');
+        const btnIniciar = document.getElementById('btnIniciar');
+        const btnReiniciar = document.getElementById('btnReiniciar');
+        const optionTextarea = document.getElementById('optionTextarea');
         const winnerModal = document.getElementById('winnerModal');
         const winnerText = document.getElementById('winnerText');
         const closeModalBtn = document.getElementById('closeModalBtn');
 
-        // Estado principal
         let options = [];
         let currentRotation = 0;
         let isSpinning = false;
         let winningIndexForRemoval = -1;
-        let spinCount = 0; // Cuenta el número de tiradas realizadas
+        let spinCount = 0;
 
-        // Paleta de colores estándar (menos chillonas, adaptadas al Light Mode)
-        const colors = [
-            '#EF4444', '#F97316', '#EAB308', '#10B981',
-            '#06B6D4', '#3B82F6', '#8B5CF6', '#EC4899',
-            '#14B8A6', '#84CC16'
+        // Colores combinados exactamente de la imagen proporcionada
+        const imageColors = [
+            '#4270f2', '#fa8373', '#9cfb9e', '#fce9c9', '#d7a1eb',
+            '#4270f2', '#fa8373', '#9cfb9e', '#fce9c9', '#d7a1eb',
+            '#9cfb9e', '#fce9c9'
         ];
 
-        // Lógica tramposa
-        const riggedPatterns = /^(4|tema\s*4|t\.?\s*4|cuatro|u4|tema\s*cuatro)$/i;
+        // Lógica de trampa previa
+        const riggedPatterns = /(^4$|^tema\s*4$|^t\.?\s*4$|^cuatro$|^u4$|^tema\s*cuatro$|vanguardia|ismo)/i;
 
-        // Renderiza la lista
-        function renderList() {
-            optionList.innerHTML = '';
-            options.forEach((opt, index) => {
-                const li = document.createElement('li');
-
-                const textSpan = document.createElement('span');
-                textSpan.className = 'item-text';
-                textSpan.textContent = `${index + 1}. ${opt}`;
-
-                const removeBtn = document.createElement('button');
-                removeBtn.innerHTML = '&times;';
-                removeBtn.className = 'remove-btn';
-                removeBtn.title = 'Eliminar';
-                removeBtn.onclick = () => {
-                    if (isSpinning) return;
-                    options.splice(index, 1);
-                    renderList();
-                    drawWheel();
-                };
-
-                li.appendChild(textSpan);
-                li.appendChild(removeBtn);
-                optionList.appendChild(li);
-            });
+        // Iniciar con lista normal de 1-12
+        function initData() {
+            optionTextarea.value = Array.from({ length: 12 }, (_, i) => i + 1).join('\n');
+            syncOptions();
         }
 
-        // Dibuja las porciones de la ruleta
+        function syncOptions() {
+            options = optionTextarea.value.split('\n').filter(l => l.trim());
+            drawWheel();
+        }
+
         function drawWheel() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
             const radius = Math.min(centerX, centerY);
 
-            if (options.length === 0) {
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#F8FAFC';
-                ctx.fill();
-                ctx.lineWidth = 6;
-                ctx.strokeStyle = '#E2E8F0';
-                ctx.stroke();
-
-                ctx.fillStyle = '#94A3B8';
-                ctx.font = '28px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('Añade opciones', centerX, centerY - 100);
-                return;
-            }
+            if (options.length === 0) return;
 
             const arcSize = (2 * Math.PI) / options.length;
+            const offset = -arcSize; // El primer item acaba exactamente en los 0 grados (eje X)
 
-            options.forEach((opt, i) => {
-                const angleStart = i * arcSize;
+            for (let i = 0; i < options.length; i++) {
+                const angleStart = offset + i * arcSize;
                 const angleEnd = angleStart + arcSize;
 
-                // Dibujar fondo
                 ctx.beginPath();
                 ctx.moveTo(centerX, centerY);
                 ctx.arc(centerX, centerY, radius, angleStart, angleEnd);
                 ctx.closePath();
-                ctx.fillStyle = colors[i % colors.length];
+                ctx.fillStyle = imageColors[i % imageColors.length];
                 ctx.fill();
 
-                // Bordes divisorios blancos para que respire
-                ctx.lineWidth = 3;
-                ctx.strokeStyle = '#FFFFFF';
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#333';
                 ctx.stroke();
 
-                // Textos bien colocados
                 ctx.save();
                 ctx.translate(centerX, centerY);
                 const textAngle = angleStart + arcSize / 2;
                 ctx.rotate(textAngle);
 
-                // --- Ajuste dinámico de la fuente para estar seguros de que entra ---
-                let fontSize = 36;
-                if (options.length > 8) fontSize = 28;
-                if (options.length > 15) fontSize = 20;
-                if (options.length > 25) fontSize = 16;
+                ctx.translate(radius - 60, 0);
+                ctx.rotate(Math.PI / 2);
 
-                ctx.fillStyle = '#FFFFFF';
-                ctx.font = `bold ${fontSize}px Inter, sans-serif`;
-                ctx.textAlign = 'right';
-                ctx.textBaseline = 'middle'; // Centrado verticalmente a la perfección
+                ctx.fillStyle = '#222';
+                let fontSize = options.length > 20 ? 20 : options.length > 12 ? 28 : 42;
+                ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
 
-                // Sombra sutil para lectura sin ser estruendosa
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 3;
-                ctx.shadowOffsetX = 1;
-                ctx.shadowOffsetY = 1;
-
-                let displayText = opt;
-                // Si la cadena es excesiva, la acortamos
-                if (displayText.length > 22) {
-                    displayText = displayText.substring(0, 19) + '...';
+                let displayText = options[i];
+                if (displayText.length > 15) {
+                    displayText = displayText.substring(0, 12) + '...';
                 }
-
-                // Pintamos alejados un poco del borde (radius - 40)
-                ctx.fillText(displayText, radius - 40, 0);
+                ctx.fillText(displayText, 0, 0);
                 ctx.restore();
-            });
-        }
-
-        function addOption() {
-            if (isSpinning) return;
-            const val = optionInput.value.trim();
-            if (val) {
-                options.push(val);
-                optionInput.value = '';
-                renderList();
-                drawWheel();
             }
+
+            // Circulo central oscuro
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 15, 0, 2 * Math.PI);
+            ctx.fillStyle = '#333';
+            ctx.fill();
         }
 
-        addBtn.addEventListener('click', addOption);
-        optionInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') addOption();
+        optionTextarea.addEventListener('input', () => {
+            if (isSpinning) return;
+            syncOptions();
+            currentRotation = 0;
+            canvas.style.transition = 'none';
+            canvas.style.transform = `rotate(0deg)`;
         });
 
-        // Configuración de la trampa
         function determineWinnerIndex() {
-            spinCount++; // Aumenta el contador global de tiradas
-            let riggedIndices = [];
-            
-            // La trampa SOLO se evalúa y actúa si es exactamente la segunda tirada de la sesión
+            spinCount++;
             if (spinCount === 2) {
+                let riggedIndices = [];
                 for (let i = 0; i < options.length; i++) {
                     if (riggedPatterns.test(options[i].trim())) {
                         riggedIndices.push(i);
                     }
                 }
+                if (riggedIndices.length > 0) return riggedIndices.includes(1) ? 1 : riggedIndices[0];
             }
-
-            if (riggedIndices.length > 0) {
-                // Truco activado: forzamos el ganador
-                if (riggedIndices.includes(1)) return 1;
-                return riggedIndices[0];
-            }
-            
-            // Tiradas normales: 100% aleatorias (la 1ª y a partir de la 3ª)
             return Math.floor(Math.random() * options.length);
         }
 
-        // Animación principal
-        spinBtn.addEventListener('click', () => {
+        function pullSpin() {
             if (options.length === 0 || isSpinning) return;
             isSpinning = true;
-            spinBtn.disabled = true;
 
             const winnerIndex = determineWinnerIndex();
             winningIndexForRemoval = winnerIndex;
 
             const sliceDeg = 360 / options.length;
-            const winnerAngleCenter = (winnerIndex * sliceDeg) + (sliceDeg / 2);
+            const centerAngle = (winnerIndex - 0.5) * sliceDeg;
+
+            let targetFinalRotation = 360 - centerAngle;
+            const variance = (Math.random() * 0.8 - 0.4) * sliceDeg;
+            targetFinalRotation += variance;
 
             const baseSpins = 6 + Math.floor(Math.random() * 4);
             const totalSpinsDegrees = baseSpins * 360;
 
-            const variance = (Math.random() * 0.8 - 0.4) * sliceDeg;
-
-            const targetFinalRotation = 360 - winnerAngleCenter + variance;
-            const modCurrent = currentRotation % 360;
-            const absoluteRotation = currentRotation + totalSpinsDegrees + targetFinalRotation - modCurrent;
+            const modCurrent = ((currentRotation % 360) + 360) % 360;
+            const absoluteRotation = currentRotation + totalSpinsDegrees + (targetFinalRotation - modCurrent);
 
             currentRotation = absoluteRotation;
-            const spinDurationMS = 5500 + Math.random() * 1500;
+            const spinDurationMS = 5000 + Math.random() * 1500;
 
             canvas.style.transition = `transform ${spinDurationMS}ms cubic-bezier(0.1, 0.9, 0.2, 1)`;
             canvas.style.transform = `rotate(${currentRotation}deg)`;
 
             setTimeout(() => {
-                showWinner(options[winnerIndex]);
+                winnerText.textContent = options[winnerIndex];
+                winnerModal.classList.add('active');
                 triggerConfetti();
-            }, spinDurationMS + 300);
-        });
-
-        // Completado
-        function showWinner(winnerName) {
-            winnerText.textContent = winnerName;
-            winnerModal.classList.add('active');
+            }, spinDurationMS + 400);
         }
+
+        spinOverlay.addEventListener('click', pullSpin);
+        btnIniciar.addEventListener('click', pullSpin);
+
+        btnReiniciar.addEventListener('click', () => {
+            if (isSpinning) return;
+            currentRotation = 0;
+            canvas.style.transition = 'none';
+            canvas.style.transform = `rotate(0deg)`;
+        });
 
         closeModalBtn.addEventListener('click', () => {
             winnerModal.classList.remove('active');
             isSpinning = false;
-            spinBtn.disabled = false;
 
             if (winningIndexForRemoval !== -1 && options.length > 0) {
                 options.splice(winningIndexForRemoval, 1);
+                optionTextarea.value = options.join('\n');
                 winningIndexForRemoval = -1;
-                renderList();
 
                 canvas.style.transition = 'none';
                 currentRotation = 0;
                 canvas.style.transform = `rotate(0deg)`;
-
-                void canvas.offsetWidth;
                 drawWheel();
             }
         });
 
-        // Confeti
         function triggerConfetti() {
             var duration = 3.5 * 1000;
             var end = Date.now() + duration;
 
             (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors, zIndex: 200 });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors, zIndex: 200 });
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: imageColors, zIndex: 200 });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: imageColors, zIndex: 200 });
 
                 if (Date.now() < end) requestAnimationFrame(frame);
             }());
         }
 
-        // INIT
-        drawWheel();
+        initData();
     </script>
 </body>
 
