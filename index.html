@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Ruleta Aleatoria</title>
-    <!-- Confetti.js -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body,
@@ -241,7 +240,6 @@
 <body>
 
     <div class="main-container">
-        <!-- Rueda a la izquierda -->
         <div class="left-section">
             <h1>La Ruleta Aleatoria</h1>
             <div class="wheel-wrapper">
@@ -251,7 +249,6 @@
             </div>
         </div>
 
-        <!-- Controles a la derecha -->
         <div class="controls-container">
             <div class="top-row">
                 <button id="btnIniciar" class="btn-iniciar">Iniciar</button>
@@ -268,7 +265,6 @@
         </div>
     </div>
 
-    <!-- Modal de Resultado -->
     <div id="winnerModal" class="modal">
         <div class="modal-content">
             <h2>¡Tenemos un ganador!</h2>
@@ -292,7 +288,6 @@
         let currentRotation = 0;
         let isSpinning = false;
         let winningIndexForRemoval = -1;
-        let spinCount = 0;
 
         // Colores combinados exactamente de la imagen proporcionada
         const imageColors = [
@@ -300,9 +295,6 @@
             '#4270f2', '#fa8373', '#9cfb9e', '#fce9c9', '#d7a1eb',
             '#9cfb9e', '#fce9c9'
         ];
-
-        // Lógica de trampa previa
-        const riggedPatterns = /(^4$|^tema\s*4$|^t\.?\s*4$|^cuatro$|^u4$|^tema\s*cuatro$|vanguardia|ismo)/i;
 
         // Iniciar con lista normal de 1-12
         function initData() {
@@ -378,17 +370,8 @@
             canvas.style.transform = `rotate(0deg)`;
         });
 
+        // 100% Aleatorio y Justo
         function determineWinnerIndex() {
-            spinCount++;
-            if (spinCount === 2) {
-                let riggedIndices = [];
-                for (let i = 0; i < options.length; i++) {
-                    if (riggedPatterns.test(options[i].trim())) {
-                        riggedIndices.push(i);
-                    }
-                }
-                if (riggedIndices.length > 0) return riggedIndices.includes(1) ? 1 : riggedIndices[0];
-            }
             return Math.floor(Math.random() * options.length);
         }
 
